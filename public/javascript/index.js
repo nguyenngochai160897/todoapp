@@ -6,16 +6,31 @@ function getTitles() {
         let result = data.result;
         let length = result.length
         let html = "";
+        console.log(result)
         for (let i = 0; i < length; i++) {
-            html +=
+            if(result[i].completed == 0){
+                html +=
                 '<li class="todo" >' +
                 '<div class="view">' +
-                '<input name = "sport" class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
                 '<label >' + result[i].title + '</label>' +
                 '<button class="destroy"></button>' +
                 '</div>' +
                 '<input class="edit" type="text" value= ' + result[i].title + '>' +
                 '</li>';
+            }
+           
+            else {
+                html +=
+                '<li class="todo" >' +
+                '<div class="view">' +
+                '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
+                '<button class="destroy"></button>' +
+                '</div>' +
+                '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                '</li>';
+            }
         }
         $(".todo-list").html(html)
         showCountTitle()

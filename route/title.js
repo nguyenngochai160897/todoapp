@@ -51,6 +51,17 @@ router.put("/title", (req, res) => {
     })
 })
 
+router.put("/title-completed", (req, res) => {
+    let completed = req.body.completed
+    if(req.body.completed != ""){
+        con.query("UPDATE titles SET completed = " + completed + " WHERE id = " + req.body.id , (err, result) => {
+            res.json({
+                result: result
+            })
+        })
+    }
+})
+
 router.delete("/title/:id", (req, res) => {
     let id = req.params.id
     console.log(id)

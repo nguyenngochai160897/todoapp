@@ -23,14 +23,37 @@
             $(".todo-list").on("click", ".toggle", function () {
                 if(checkActive == true){
                     ($(this).parents(".todo").hide())
+                    
                 }
                 if(checkCompleted == true){
                     ($(this).parents(".todo").hide())
                 }
+                updateCompleted(this)
             })
             
 
         })
+
+        function updateCompleted(th) {
+            let id = $(th).val()
+            let completed ;
+            if($(th).is(":checked")) {
+                completed = true;
+            }
+            else{
+                completed = false;
+            }
+            $.ajax({
+                url: "http://localhost:3000/title-completed",
+                type: "put",
+                data: {
+                    id: id,
+                     completed: completed
+                }
+            }).done( function(data) {
+                console.log(data)
+            })
+        }
         let checkActive = false;
         let checkCompleted = false;
 
@@ -81,14 +104,14 @@
             <input id="toggle-all" class="toggle-all" type="checkbox">
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
-                <li class="todo">
-                    <div class="view">
+                <!-- <li class="todo"> -->
+                    <!-- <div class="view">
                         <input class="toggle" type="checkbox">
                         <label>{{todo.title}}</label>
                         <button class="destroy"></button>
                     </div>
-                    <input class="edit" type="text">
-                </li>
+                    <input class="edit" type="text"> -->
+                <!-- </li> -->
             </ul>
         </section>
         <footer class="footer">
