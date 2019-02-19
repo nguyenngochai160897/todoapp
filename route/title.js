@@ -33,14 +33,14 @@ router.get("/title", (req, res) => {
     // })
     Title.findAll({
         raw: true
-    }).then( result => {
+    }).then(result => {
         res.json({
             result: result,
             length: result.length
         })
     })
 
-    
+
 })
 
 router.get("/last-title", (req, res) => {
@@ -49,7 +49,7 @@ router.get("/last-title", (req, res) => {
     //         result: result
     //     })
     // })
-    
+
 })
 
 router.post("/title", (req, res) => {
@@ -66,7 +66,7 @@ router.post("/title", (req, res) => {
     // })
     Title.create({
         title: req.body.title,
-    }).then( (result) => {
+    }).then((result) => {
         res.json({
             result: result
         })
@@ -85,14 +85,14 @@ router.put("/title", (req, res) => {
     Title.update({
         title: req.body.title
     }, {
-        where: {
-            id: req.body.id
-        }
-    }).then( (result) => {
-        res.json({
-            result: result
+            where: {
+                id: req.body.id
+            }
+        }).then((result) => {
+            res.json({
+                result: result
+            })
         })
-    })
 })
 
 router.put("/title-completed", (req, res) => {
@@ -106,20 +106,20 @@ router.put("/title-completed", (req, res) => {
         Title.update({
             completed: req.body.completed
         }, {
-            where: {
-                id: req.body.id
-            }
-        }).then( (result) => {
-            res.json({
-                result: result
+                where: {
+                    id: req.body.id
+                }
+            }).then((result) => {
+                res.json({
+                    result: result
+                })
             })
-        })
     }
 })
 
 router.delete("/title/:id", (req, res) => {
     let id = req.params.id
-    
+
     // con.query("DELETE FROM titles  " + " WHERE id = " + id, (err, result) => {
     //     res.json({
     //         result: result
@@ -129,18 +129,18 @@ router.delete("/title/:id", (req, res) => {
         where: {
             id: id
         }
-    }).then( (result) => {
-       res.json({
-           result: result
-       })
+    }).then((result) => {
+        res.json({
+            result: result
+        })
     })
 })
 
 router.post("/titles-delete/", (req, res) => {
-    
+
     console.log(req.body.arr)
     let arr = req.body.arr;
-    
+
     // con.query("DELETE FROM titles WHERE id IN (" + arrID + ")", (err, result) => {
     //     res.json({
     //         result: result
@@ -150,12 +150,39 @@ router.post("/titles-delete/", (req, res) => {
         where: {
             id: arr
         }
-    }).then( (result) => {
+    }).then((result) => {
         res.json({
             result: result
         })
     })
 })
 
+router.get("/title-search/:data", (req, res) => {
+    let data = req.params.data;
+    const Op = Sequelize.Op;
+    Title.findAll({
+        where: {
+           title:{
+                [Op.like]: '%'+data+'%'
+           }
+        }
+    }).then((result) => {
+        res.json({
+            result: result
+        })
+    })
+
+})
+
+router.get("/title-limit/:page", (req, res) => {
+    let page = req.params.page;
+    let offset = (page-1) * 5 ;
+    Title.findAll({limit: 5, offset: offset}).then( (result) => {
+        res.json({
+            result: result
+        })
+    })
+    
+})
 
 module.exports = router

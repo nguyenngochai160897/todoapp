@@ -1,47 +1,47 @@
 let lengthGlobal = 0;
+let page = 1;
 function getTitles() {
-    
+
     $.ajax({
         url: "http://localhost:3000/title",
         type: "get",
-       async: false
+        async: false
     }).done(function (data) {
         let result = data.result;
         let length = result.length
         lengthGlobal = length;
-        let html = "";
-        for (let i = 0; i < length; i++) {
-            if (result[i].completed == 0) {
-                html +=
-                    '<li class="todo" >' +
-                    '<div class="view">' +
-                    '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
-                    '<label >' + result[i].title + '</label>' +
-                    '<button class="destroy"></button>' +
-                    '</div>' +
-                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
-                    '</li>';
-                
-            }
+        // let html = "";
+        // for (let i = 0; i < length; i++) {
+        //     if (result[i].completed == 0) {
+        //         html +=
+        //             '<li class="todo" >' +
+        //             '<div class="view">' +
+        //             '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+        //             '<label >' + result[i].title + '</label>' +
+        //             '<button class="destroy"></button>' +
+        //             '</div>' +
+        //             '<input class="edit" type="text" value= ' + result[i].title + '>' +
+        //             '</li>';
 
-            else {
-                html +=
-                    '<li class="todo" >' +
-                    '<div class="view">' +
-                    '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
-                    '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
-                    '<button class="destroy"></button>' +
-                    '</div>' +
-                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
-                    '</li>';
-                $(".clear-completed").show();
-            }
-        }
-        $(".todo-list").html(html)
-        showCountTitle()
+        //     }
+
+        //     else {
+        //         html +=
+        //             '<li class="todo" >' +
+        //             '<div class="view">' +
+        //             '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+        //             '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
+        //             '<button class="destroy"></button>' +
+        //             '</div>' +
+        //             '<input class="edit" type="text" value= ' + result[i].title + '>' +
+        //             '</li>';
+        //         $(".clear-completed").show();
+        //     }
+        // }
+        // $(".todo-list").html(html)
+        // showCountTitle()
     })
-    
-    console.log(lengthGlobal)
+
 }
 
 // function getLastTitle() {
@@ -70,7 +70,7 @@ function getTitles() {
 
 function showCountTitle() {
     let length = lengthGlobal - $(".toggle").filter(":checked").length
-    
+
     if (length <= 1) {
         $(".count").html(length + " item")
         $(".main ").show()
@@ -100,7 +100,56 @@ function showCountTitle() {
 
 
 $(document).ready(function () {
-    getTitles();
+    getTitles()
+
+    let checkNext = lengthGlobal / 5; 
+    if (checkNext >= page) $("#next").show()
+    else {
+        $("#next").hide();
+    }
+
+    $("#next").on("click", function () {
+        page++;
+        if (checkNext >= page) {
+            $("#next").show()
+        }
+        else {
+            $("#next").hide();
+        }
+        if (page == 1) {
+            $("#previous").hide();
+        }
+        else {
+            $("#previous").show()
+        }
+        getTitleLimit(page)
+    })
+
+
+    if (page == 1) {
+        $("#previous").hide();
+    }
+    else {
+        $("#previous").show()
+    }
+    $("#previous").on("click", function () {
+        page--;
+        if (page == 1) {
+            $("#previous").hide();
+        }
+        else {
+            $("#previous").show()
+        }
+        if (checkNext >= page) {
+            $("#next").show()
+        }
+        else {
+            $("#next").hide();
+        }
+        getTitleLimit(page)
+    })
+
+    getTitleLimit(page);
 
 
     $(".new-todo").keypress(function (event) {
@@ -117,7 +166,7 @@ $(document).ready(function () {
                     }
                 }).done(function (data) {
                     $(".new-todo").val("")
-                    getTitles();
+                    getTitleLimit(page);
                 })
             }
             else {
@@ -140,7 +189,6 @@ $(document).ready(function () {
         else {
             $(this).siblings("label").css("text-decoration", "none")
         }
-        // showCountTitle(getTitles());
 
     })
 
@@ -151,7 +199,7 @@ $(document).ready(function () {
             url: "http://localhost:3000/title/" + id,
             type: "delete"
         }).done(function (data) {
-            getTitles()
+            getTitleLimit(page)
         })
     })
 
@@ -175,7 +223,7 @@ $(document).ready(function () {
                     url: "http://localhost:3000/title/" + id,
                     type: "delete"
                 }).done(function (data) {
-                    getTitles();
+                    getTitleLimit(page);
                 })
             }
             $.ajax({
@@ -186,7 +234,7 @@ $(document).ready(function () {
                     id: id
                 }
             }).done(function (data) {
-                getTitles();
+                getTitleLimit(page);
             })
         }
     })
@@ -200,15 +248,15 @@ $(document).ready(function () {
             arrGlobal[i] = parseInt(arrGlobal[i])
         }
         console.log(Array.isArray(arrGlobal))
-       
+
         $.ajax({
-            url: "http://localhost:3000/titles-delete/" ,
+            url: "http://localhost:3000/titles-delete/",
             method: "post",
-            data:{
+            data: {
                 arr: arrGlobal
             }
         }).done(function (data) {
-            getTitles();
+            getTitleLimit(page);
             $(".clear-completed").hide();
         })
     })
@@ -253,6 +301,53 @@ $(document).ready(function () {
             ($(this).parents(".todo").hide())
         }
         updateCompleted(this)
+    })
+
+    $("#search").on("keyup", function () {
+        let data = $("#search").val();
+        if (data != "") {
+            $.ajax({
+                url: "http://localhost:3000/title-search/" + data,
+                type: "GET"
+            }).done(function (data) {
+                let result = data.result;
+                let length = result.length
+                lengthGlobal = length;
+                let html = "";
+                $(".clear-completed").hide();
+                for (let i = 0; i < length; i++) {
+                    if (result[i].completed == false) {
+                        html +=
+                            '<li class="todo" >' +
+                            '<div class="view">' +
+                            '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                            '<label >' + result[i].title + '</label>' +
+                            '<button class="destroy"></button>' +
+                            '</div>' +
+                            '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                            '</li>';
+                    }
+
+                    else {
+                        html +=
+                            '<li class="todo" >' +
+                            '<div class="view">' +
+                            '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                            '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
+                            '<button class="destroy"></button>' +
+                            '</div>' +
+                            '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                            '</li>';
+                        $(".clear-completed").show();
+                    }
+                }
+                $(".todo-list").html(html)
+                showCountTitle()
+            })
+        }
+        else {
+            getTitleLimit(page);
+        }
     })
 
 
@@ -314,4 +409,45 @@ function active() {
     })
     checkActive = true;
     checkCompleted = false;
+}
+
+function getTitleLimit(page) {
+    $.ajax({
+        url: "http://localhost:3000/title-limit/" + page,
+        type: "get"
+    }).done(function (data) {
+        let result = data.result;
+        let length = result.length
+        lengthGlobal = length;
+        let html = "";
+        $(".clear-completed").hide();
+        for (let i = 0; i < length; i++) {
+            if (result[i].completed == false) {
+                html +=
+                    '<li class="todo" >' +
+                    '<div class="view">' +
+                    '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                    '<label >' + result[i].title + '</label>' +
+                    '<button class="destroy"></button>' +
+                    '</div>' +
+                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                    '</li>';
+            }
+
+            else {
+                html +=
+                    '<li class="todo" >' +
+                    '<div class="view">' +
+                    '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                    '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
+                    '<button class="destroy"></button>' +
+                    '</div>' +
+                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                    '</li>';
+                $(".clear-completed").show();
+            }
+        }
+        $(".todo-list").html(html)
+        showCountTitle()
+    })
 }

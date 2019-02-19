@@ -8,23 +8,39 @@
     <link rel="stylesheet" href="public/style/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="public/javascript/index.js"></script>
-    
+    <script>
+        $(document).ready(function () 
+        {
+            
+            
+        })
+
+        
+    </script>
 </head>
 
 <body>
     <section class="todoapp">
         <header class="header">
             <h1>todos</h1>
+            <div class="search">
+                <input type="text" id="search">
+            </div>
+            <div class="pagination">
+                <a href="#" id="previous">Previous</a>
+                <a href="#" id="next">Next</a>
+            </div>
             <form>
                 <input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?">
             </form>
         </header>
+
         <section class="main">
             <input id="toggle-all" class="toggle-all" type="checkbox">
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
                 <!-- <li class="todo"> -->
-                    <!-- <div class="view">
+                <!-- <div class="view">
                         <input class="toggle" type="checkbox">
                         <label>{{todo.title}}</label>
                         <button class="destroy"></button>
