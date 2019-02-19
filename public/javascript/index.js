@@ -1,12 +1,14 @@
+let lengthGlobal = 0;
 function getTitles() {
-    let length = 0;
+    
     $.ajax({
         url: "http://localhost:3000/title",
         type: "get",
        async: false
     }).done(function (data) {
         let result = data.result;
-        length = result.length
+        let length = result.length
+        lengthGlobal = length;
         let html = "";
         for (let i = 0; i < length; i++) {
             if (result[i].completed == 0) {
@@ -39,7 +41,7 @@ function getTitles() {
         showCountTitle()
     })
     
-    
+    console.log(lengthGlobal)
 }
 
 // function getLastTitle() {
@@ -67,7 +69,7 @@ function getTitles() {
 // }
 
 function showCountTitle() {
-    let length = lengthTitles() - $(".toggle").filter(":checked").length
+    let length = lengthGlobal - $(".toggle").filter(":checked").length
     
     if (length <= 1) {
         $(".count").html(length + " item")
@@ -79,22 +81,22 @@ function showCountTitle() {
         $(".main ").show()
         $(".footer").show()
     }
-    if (lengthTitles() == 0) {
+    if (lengthGlobal == 0) {
         $(".footer").hide()
     }
 }
 
-let lengthTitles = function () {
-    let length = 0;
-    $.ajax({
-        url: "http://localhost:3000/title",
-        type: "get",
-        async: false,
-    }).done(function (data) {
-        length = data.result.length
-    })
-    return length
-};
+// let lengthTitles = function () {
+//     let length = 0;
+//     $.ajax({
+//         url: "http://localhost:3000/title",
+//         type: "get",
+//         async: false,
+//     }).done(function (data) {
+//         length = data.result.length
+//     })
+//     return length
+// };
 
 
 $(document).ready(function () {

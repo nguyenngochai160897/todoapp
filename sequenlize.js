@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('mydb', 'root', '', {
+const sequelize = new Sequelize('mydb', 'postgres', '1234', {
     host: 'localhost',
-    dialect: 'mysql',
+    dialect: 'postgres',
 
     pool: {
         max: 5,
@@ -17,7 +17,7 @@ const sequelize = new Sequelize('mydb', 'root', '', {
     // operatorsAliases: false
 });
 
-
+// const sequelize = new Sequelize('postgres://postgres:1234@example.com:5432/mydb');
 
 sequelize
     .authenticate()
