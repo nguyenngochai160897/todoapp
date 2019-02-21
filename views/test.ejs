@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        li{
+            list-style-type: none;
+            display: inline;
+            margin: 10px
+        }
+    </style>
+    <script>
+        var result = "";
+        var arr = [];
+        var length = 0;
+        var page = 1;
+        var offset = 0;
+        $(document).ready( function(){
+            $.ajax({
+                url: "http://localhost:3000/title",
+                type: "get",
+                async: false
+            }).done( function(data){
+                result = data.result;
+                length = data.result.length
+                console.log( result)
+                offset = (page-1)*5;
+                let paginate = Math.ceil(length/5)
+                let html = "";
+                for(var i = 1; i <= paginate; i++){
+                    html+="<li><a href = '?page="+i+"'>"+i+"</a></li>"
+                }
+                $("#pagination").html(html)
+               
+                html = "";
+                for(var i = offset; i < offset+5; i++){
+                    html+=result[i].title+"  ";
+                }
+                offset= offset+5;
+                $("#demo").html(html)
+            })
+
+            $("a").on("click", function(e){
+                e.preventDefault()
+                
+                page = $(this).html();
+                offset = (page-1)*5;
+                console.log(typeof Number(page))
+                let html = "";
+                for(var i = offset; i < offset+5; i++){
+                    
+                    if(result[i] ==undefined) html+="";
+                    else html+=result[i].title + " ";
+                }
+                $("#demo").html(html)
+                offset= offset+5;
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id = "demo">
+
+    </div>
+
+    <div id = "pagination">
+        
+    </div>
+
+</body>
+</html>

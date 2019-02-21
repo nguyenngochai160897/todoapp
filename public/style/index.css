@@ -382,7 +382,18 @@ html .clear-completed:active {
 	top:-100px
 }
 
-.pagination{
+
+nav{
 	position: absolute;
-	top:-60px
+	top: 90%
+}
+
+.page-item{
+	
+  	display: inline-block;
+  	padding: 8px 16px;
+}
+
+a{
+	text-decoration: none;
 }

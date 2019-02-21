@@ -4,32 +4,100 @@
 <head>
     <meta charset="utf-8">
     <title>TodoAPP</title>
+
     <link rel="stylesheet" href="public/style/base.css">
     <link rel="stylesheet" href="public/style/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="public/javascript/index.js"></script>
     <script>
-        $(document).ready(function () 
-        {
-            
-            
+        $(document).ready(function () {
+            var nextPage = 0;
+            var prePage = 2;
+            $("#previous").on("click", function (e) {
+                e.preventDefault();
+
+                $(this).css("color", "red")
+                $("#next").css("color", "blue")
+
+                if ($("#search").val() != "") {
+                    let totalPagesSearch = Math.ceil(lengthPage / 2)
+                    pageSearch = pageSearch - 1;
+                    nextPage = pageSearch + 1;
+                    prePage = pageSearch - 1;
+                    if (nextPage > totalPagesSearch) pageSearch = totalPagesSearch;
+                    else if (prePage < 1) pageSearch = 1
+                    search(pageSearch)
+                }
+                else {
+                    let totalPages = Math.ceil(lengthGlobal / 5)
+                    page = page - 1;
+                    nextPage = page + 1;
+                    prePage = page - 1;
+                    if (nextPage > totalPages) page = totalPages;
+                    else if (prePage < 1) page = 1;
+                    getTitleLimit(page);
+                }
+            })
+            $("#next").on("click", function (e) {
+                e.preventDefault();
+                $(this).css("color", "red")
+                $("#previous").css("color", "blue")
+                if ($("#search").val() != "") {
+                    let totalPagesSearch = Math.ceil(lengthPage / 2)
+                    pageSearch = pageSearch + 1;
+                    nextPage = pageSearch + 1;
+                    prePage = pageSearch - 1;
+                    if (nextPage > totalPagesSearch) pageSearch = totalPagesSearch;
+                    else if (prePage < 1) pageSearch = 1
+                    search(pageSearch)
+                }
+                else {
+                    let totalPages = Math.ceil(lengthGlobal / 5)
+                    page = page + 1;
+                    nextPage = page + 1;
+                    prePage = page - 1;
+                    if (nextPage > totalPages) page = totalPages;
+                    else if (prePage < 1) page = 1;
+                    getTitleLimit(page);
+                }
+            })
         })
 
-        
+        function setPage() {
+            if ($("#search").val() != "") {
+                console.log("page search: ", pageSearch)
+                if (lengthPage % 2 == 0 && lengthPage != 0) {
+                    console.log("12345678")
+                    doSearch()
+                    search(pageSearch/2)
+                }
+                else{
+                    doSearch()
+                    search(1)
+                }
+            } else {
+                if (lengthGlobal % 5 == 0 && lengthGlobal != 0) {
+                    getTitleLimit(lengthGlobal / 5)
+                }
+            }
+        }
     </script>
 </head>
 
 <body>
+    <div id="padding"></div>
+
     <section class="todoapp">
         <header class="header">
             <h1>todos</h1>
             <div class="search">
-                <input type="text" id="search">
+                <input type="text" id="search" placeholder="search"
+                    style="width: 200px; height: 30px; font-size: 20px; padding: 5px">
             </div>
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <a href="#" id="previous">Previous</a>
                 <a href="#" id="next">Next</a>
-            </div>
+            </div> -->
             <form>
                 <input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?">
             </form>
@@ -61,11 +129,13 @@
             </button>
         </footer>
     </section>
-    <footer class="info">
-        <p>Double-click to edit a todo</p>
-        <p>Written by <a href="http://evanyou.me">Evan You</a></p>
-        <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
-    </footer>
+    <nav>
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" id="previous" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="next">Next</a></li>
+        </ul>
+
+    </nav>
 
 
 </body>

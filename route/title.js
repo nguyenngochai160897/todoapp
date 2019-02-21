@@ -138,7 +138,6 @@ router.delete("/title/:id", (req, res) => {
 
 router.post("/titles-delete/", (req, res) => {
 
-    console.log(req.body.arr)
     let arr = req.body.arr;
 
     // con.query("DELETE FROM titles WHERE id IN (" + arrID + ")", (err, result) => {
@@ -159,13 +158,47 @@ router.post("/titles-delete/", (req, res) => {
 
 router.get("/title-search/:data", (req, res) => {
     let data = req.params.data;
+    let page = req.query.page;
     const Op = Sequelize.Op;
+
     Title.findAll({
         where: {
-           title:{
-                [Op.like]: '%'+data+'%'
-           }
-        }
+            title: {
+                [Op.like]: '%' + data + '%'
+            }
+        }, limit: 2, offset: (page-1)*2
+    }).then((result) => {
+        res.json({
+            result: result
+        })
+    })
+})
+
+router.get("/title-length-search/:data", (req, res) => {
+    let data = req.params.data;
+    const Op = Sequelize.Op;
+
+    Title.findAll({
+        where: {
+            title: {
+                [Op.like]: '%' + data + '%'
+            }
+        }, 
+        attributes: [[sequelize.fn("COUNT", sequelize.col('id')), "length"]]
+    }).then((result) => {
+        res.json({
+            result: result
+        })
+    })
+})
+
+router.get("/title-limit/:page", (req, res) => {
+    let page = req.params.page;
+    let offset = (page - 1) * 5;
+    Title.findAll({
+        order: [["id", "ASC"]]
+        , limit: 5
+        , offset: offset
     }).then((result) => {
         res.json({
             result: result
@@ -174,15 +207,12 @@ router.get("/title-search/:data", (req, res) => {
 
 })
 
-router.get("/title-limit/:page", (req, res) => {
-    let page = req.params.page;
-    let offset = (page-1) * 5 ;
-    Title.findAll({limit: 5, offset: offset}).then( (result) => {
-        res.json({
-            result: result
-        })
-    })
-    
-})
+// Total number og pages
+// totalPages = Math.ceil(total / perPage)
 
+//check current page
+//if(page == undefined) page = 0
+//else page = req.body.page
+//if(page<1) page = 1
+//else if(page>totalPages) page = totalPages
 module.exports = router

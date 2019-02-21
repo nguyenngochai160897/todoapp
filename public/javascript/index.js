@@ -1,5 +1,9 @@
+
+
 let lengthGlobal = 0;
 let page = 1;
+let lengthPage =0;
+let pageSearch = 1;
 function getTitles() {
 
     $.ajax({
@@ -102,52 +106,52 @@ function showCountTitle() {
 $(document).ready(function () {
     getTitles()
 
-    let checkNext = lengthGlobal / 5; 
-    if (checkNext >= page) $("#next").show()
-    else {
-        $("#next").hide();
-    }
+    // let checkNext = Math.ceil(lengthGlobal / 5); 
+    // if (checkNext > page) $("#next").show()
+    // else {
+    //     $("#next").hide();
+    // }
 
-    $("#next").on("click", function () {
-        page++;
-        if (checkNext >= page) {
-            $("#next").show()
-        }
-        else {
-            $("#next").hide();
-        }
-        if (page == 1) {
-            $("#previous").hide();
-        }
-        else {
-            $("#previous").show()
-        }
-        getTitleLimit(page)
-    })
+    // $("#next").on("click", function () {
+    //     page++;
+    //     if (checkNext > page) {
+    //         $("#next").show()
+    //     }
+    //     else {
+    //         $("#next").hide();
+    //     }
+    //     if (page == 1) {
+    //         $("#previous").hide();
+    //     }
+    //     else {
+    //         $("#previous").show()
+    //     }
+    //     getTitleLimit(page)
+    // })
 
 
-    if (page == 1) {
-        $("#previous").hide();
-    }
-    else {
-        $("#previous").show()
-    }
-    $("#previous").on("click", function () {
-        page--;
-        if (page == 1) {
-            $("#previous").hide();
-        }
-        else {
-            $("#previous").show()
-        }
-        if (checkNext >= page) {
-            $("#next").show()
-        }
-        else {
-            $("#next").hide();
-        }
-        getTitleLimit(page)
-    })
+    // if (page == 1) {
+    //     $("#previous").hide();
+    // }
+    // else {
+    //     $("#previous").show()
+    // }
+    // $("#previous").on("click", function () {
+    //     page--;
+    //     if (page == 1) {
+    //         $("#previous").hide();
+    //     }
+    //     else {
+    //         $("#previous").show()
+    //     }
+    //     if (checkNext > page) {
+    //         $("#next").show()
+    //     }
+    //     else {
+    //         $("#next").hide();
+    //     }
+    //     getTitleLimit(page)
+    // })
 
     getTitleLimit(page);
 
@@ -166,7 +170,9 @@ $(document).ready(function () {
                     }
                 }).done(function (data) {
                     $(".new-todo").val("")
+                    getTitles()
                     getTitleLimit(page);
+                    // setPage()
                 })
             }
             else {
@@ -199,7 +205,9 @@ $(document).ready(function () {
             url: "http://localhost:3000/title/" + id,
             type: "delete"
         }).done(function (data) {
-            getTitleLimit(page)
+            // getTitleLimit(page)
+            getTitles()
+            setPage()
         })
     })
 
@@ -224,6 +232,8 @@ $(document).ready(function () {
                     type: "delete"
                 }).done(function (data) {
                     getTitleLimit(page);
+                    getTitles()
+
                 })
             }
             $.ajax({
@@ -235,6 +245,8 @@ $(document).ready(function () {
                 }
             }).done(function (data) {
                 getTitleLimit(page);
+                getTitles()
+
             })
         }
     })
@@ -247,7 +259,7 @@ $(document).ready(function () {
         for (let i = 0; i < arrGlobal.length; i++) {
             arrGlobal[i] = parseInt(arrGlobal[i])
         }
-        console.log(Array.isArray(arrGlobal))
+        // console.log(Array.isArray(arrGlobal))
 
         $.ajax({
             url: "http://localhost:3000/titles-delete/",
@@ -256,8 +268,10 @@ $(document).ready(function () {
                 arr: arrGlobal
             }
         }).done(function (data) {
-            getTitleLimit(page);
+            // getTitleLimit(page);
             $(".clear-completed").hide();
+            getTitles()
+            setPage();
         })
     })
 
@@ -305,55 +319,68 @@ $(document).ready(function () {
 
     $("#search").on("keyup", function () {
         let data = $("#search").val();
-        if (data != "") {
-            $.ajax({
-                url: "http://localhost:3000/title-search/" + data,
-                type: "GET"
-            }).done(function (data) {
-                let result = data.result;
-                let length = result.length
-                lengthGlobal = length;
-                let html = "";
-                $(".clear-completed").hide();
-                for (let i = 0; i < length; i++) {
-                    if (result[i].completed == false) {
-                        html +=
-                            '<li class="todo" >' +
-                            '<div class="view">' +
-                            '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
-                            '<label >' + result[i].title + '</label>' +
-                            '<button class="destroy"></button>' +
-                            '</div>' +
-                            '<input class="edit" type="text" value= ' + result[i].title + '>' +
-                            '</li>';
-                    }
-
-                    else {
-                        html +=
-                            '<li class="todo" >' +
-                            '<div class="view">' +
-                            '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
-                            '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
-                            '<button class="destroy"></button>' +
-                            '</div>' +
-                            '<input class="edit" type="text" value= ' + result[i].title + '>' +
-                            '</li>';
-                        $(".clear-completed").show();
-                    }
-                }
-                $(".todo-list").html(html)
-                showCountTitle()
-            })
+        if (data != ""){
+            doSearch()
+            search(pageSearch)
         }
         else {
             getTitleLimit(page);
         }
     })
-
-
 })
 
+function doSearch(){
+    $.ajax({
+        url: "http://localhost:3000/title-length-search/" + $("#search").val(),
+        type: "get",
+        async: false
+    }).done( function(data) {
+        lengthPage = data.result[0].length
+        
+    })
+}
 
+function search(pageSearch){
+    let data = $("#search").val();
+    $.ajax({
+        url: "http://localhost:3000/title-search/" + data+"?page="+pageSearch,
+        type: "GET"
+    }).done(function (data) {
+        let result = data.result;
+        let length = result.length
+        let html = "";
+        $(".clear-completed").hide();
+        for (let i = 0; i < length; i++) {
+            if (result[i].completed == false) {
+                html +=
+                    '<li class="todo" >' +
+                    '<div class="view">' +
+                    '<input class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                    '<label >' + result[i].title + '</label>' +
+                    '<button class="destroy"></button>' +
+                    '</div>' +
+                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                    '</li>';
+            }
+            else {
+                html +=
+                    '<li class="todo" >' +
+                    '<div class="view">' +
+                    '<input checked class="toggle" type="checkbox" value = ' + result[i].id + '>' +
+                    '<label style = "text-decoration: line-through" >' + result[i].title + '</label>' +
+                    '<button class="destroy"></button>' +
+                    '</div>' +
+                    '<input class="edit" type="text" value= ' + result[i].title + '>' +
+                    '</li>';
+                $(".clear-completed").show();
+            }
+        }
+        $(".todo-list").html(html)
+        showCountTitle()
+    })
+
+    
+}
 
 function updateCompleted(th) {
     let id = $(th).val()
@@ -418,7 +445,6 @@ function getTitleLimit(page) {
     }).done(function (data) {
         let result = data.result;
         let length = result.length
-        lengthGlobal = length;
         let html = "";
         $(".clear-completed").hide();
         for (let i = 0; i < length; i++) {
